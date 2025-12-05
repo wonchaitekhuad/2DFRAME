@@ -9,6 +9,8 @@ namespace CoordinateApp
     public partial class Form1 : Form
     {
         private List<PointF> coordinates = new List<PointF>();
+        private bool isEditing = false;
+        private int editingIndex = -1;
 
         public Form1()
         {
@@ -23,12 +25,24 @@ namespace CoordinateApp
                 if (float.TryParse(txtX.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out float x) &&
                     float.TryParse(txtY.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out float y))
                 {
-                    // Add coordinate to list
-                    PointF point = new PointF(x, y);
-                    coordinates.Add(point);
+                    if (isEditing)
+                    {
+                        // Save edited coordinate
+                        coordinates[editingIndex] = new PointF(x, y);
+                        lstCoordinates.Items[editingIndex] = string.Format(CultureInfo.InvariantCulture, "{0}, {1}", x, y);
+                        
+                        // Exit edit mode
+                        ExitEditMode();
+                    }
+                    else
+                    {
+                        // Add coordinate to list
+                        PointF point = new PointF(x, y);
+                        coordinates.Add(point);
 
-                    // Add to ListBox with formatted string
-                    lstCoordinates.Items.Add($"{x}, {y}");
+                        // Add to ListBox with formatted string
+                        lstCoordinates.Items.Add(string.Format(CultureInfo.InvariantCulture, "{0}, {1}", x, y));
+                    }
 
                     // Clear input fields
                     txtX.Clear();
@@ -127,12 +141,87 @@ namespace CoordinateApp
 
         private void txtY_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Trigger Add when Enter is pressed in txtY
+            // Trigger Add/Save when Enter is pressed in txtY
             if (e.KeyChar == (char)Keys.Enter)
             {
                 e.Handled = true; // Prevent the beep sound
                 btnAdd_Click(sender, e);
             }
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (lstCoordinates.SelectedIndex >= 0)
+                {
+                    EnterEditMode(lstCoordinates.SelectedIndex);
+                }
+                else
+                {
+                    MessageBox.Show("กรุณาเลือกพิกัดที่ต้องการแก้ไข", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"เกิดข้อผิดพลาด: {ex.Message}", "ข้อผิดพลาด", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            ExitEditMode();
+            txtX.Clear();
+            txtY.Clear();
+            txtX.Focus();
+        }
+
+        private void lstCoordinates_DoubleClick(object sender, EventArgs e)
+        {
+            if (lstCoordinates.SelectedIndex >= 0)
+            {
+                EnterEditMode(lstCoordinates.SelectedIndex);
+            }
+        }
+
+        private void EnterEditMode(int index)
+        {
+            try
+            {
+                isEditing = true;
+                editingIndex = index;
+
+                // Populate textboxes with selected coordinate
+                PointF point = coordinates[index];
+                txtX.Text = point.X.ToString(CultureInfo.InvariantCulture);
+                txtY.Text = point.Y.ToString(CultureInfo.InvariantCulture);
+
+                // Update UI for edit mode
+                btnAdd.Text = "บันทึก (Save)";
+                btnCancel.Visible = true;
+                btnEdit.Enabled = false;
+                btnRemove.Enabled = false;
+
+                // Focus on txtX
+                txtX.Focus();
+                txtX.SelectAll();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"เกิดข้อผิดพลาด: {ex.Message}", "ข้อผิดพลาด", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ExitEditMode()
+        {
+            isEditing = false;
+            editingIndex = -1;
+
+            // Restore UI to normal mode
+            btnAdd.Text = "เพิ่ม (Add)";
+            btnCancel.Visible = false;
+            btnEdit.Enabled = true;
+            btnRemove.Enabled = true;
         }
     }
 }

@@ -33,7 +33,9 @@ namespace CoordinateApp
             this.txtX = new System.Windows.Forms.TextBox();
             this.txtY = new System.Windows.Forms.TextBox();
             this.btnAdd = new System.Windows.Forms.Button();
+            this.btnEdit = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.lstCoordinates = new System.Windows.Forms.ListBox();
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.lblCoordinates = new System.Windows.Forms.Label();
@@ -84,23 +86,45 @@ namespace CoordinateApp
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
+            // btnEdit
+            // 
+            this.btnEdit.Location = new System.Drawing.Point(38, 93);
+            this.btnEdit.Name = "btnEdit";
+            this.btnEdit.Size = new System.Drawing.Size(100, 23);
+            this.btnEdit.TabIndex = 5;
+            this.btnEdit.Text = "แก้ไข (Edit)";
+            this.btnEdit.UseVisualStyleBackColor = true;
+            this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
+            // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(38, 93);
+            this.btnRemove.Location = new System.Drawing.Point(38, 122);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(100, 23);
-            this.btnRemove.TabIndex = 5;
+            this.btnRemove.TabIndex = 6;
             this.btnRemove.Text = "ลบ (Remove)";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(38, 64);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(100, 23);
+            this.btnCancel.TabIndex = 10;
+            this.btnCancel.Text = "ยกเลิก (Cancel)";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Visible = false;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // lstCoordinates
             // 
             this.lstCoordinates.FormattingEnabled = true;
-            this.lstCoordinates.Location = new System.Drawing.Point(15, 145);
+            this.lstCoordinates.Location = new System.Drawing.Point(15, 174);
             this.lstCoordinates.Name = "lstCoordinates";
-            this.lstCoordinates.Size = new System.Drawing.Size(150, 290);
-            this.lstCoordinates.TabIndex = 6;
+            this.lstCoordinates.Size = new System.Drawing.Size(150, 261);
+            this.lstCoordinates.TabIndex = 7;
+            this.lstCoordinates.DoubleClick += new System.EventHandler(this.lstCoordinates_DoubleClick);
             // 
             // pictureBox
             // 
@@ -117,7 +141,7 @@ namespace CoordinateApp
             // 
             this.lblCoordinates.AutoSize = true;
             this.lblCoordinates.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCoordinates.Location = new System.Drawing.Point(12, 127);
+            this.lblCoordinates.Location = new System.Drawing.Point(12, 156);
             this.lblCoordinates.Name = "lblCoordinates";
             this.lblCoordinates.Size = new System.Drawing.Size(123, 15);
             this.lblCoordinates.TabIndex = 8;
@@ -143,6 +167,8 @@ namespace CoordinateApp
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.lstCoordinates);
             this.Controls.Add(this.btnRemove);
+            this.Controls.Add(this.btnEdit);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.txtY);
             this.Controls.Add(this.txtX);
@@ -163,7 +189,9 @@ namespace CoordinateApp
         private System.Windows.Forms.TextBox txtX;
         private System.Windows.Forms.TextBox txtY;
         private System.Windows.Forms.Button btnAdd;
+        private System.Windows.Forms.Button btnEdit;
         private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.ListBox lstCoordinates;
         private System.Windows.Forms.PictureBox pictureBox;
         private System.Windows.Forms.Label lblCoordinates;
