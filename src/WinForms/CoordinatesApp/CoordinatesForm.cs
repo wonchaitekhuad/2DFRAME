@@ -100,7 +100,7 @@ namespace CoordinatesApp
             statusLabel.Text = message;
         }
 
-        private bool ValidateInput(out string id, out double x, out double y, out string label, bool isUpdate = false)
+        private bool ValidateInput(out string id, out double x, out double y, out string label, bool isUpdate = false, string currentId = null)
         {
             // Initialize out parameters
             id = string.Empty;
@@ -118,12 +118,25 @@ namespace CoordinatesApp
                 return false;
             }
 
-            // Check for duplicate ID (only for Add, not Update)
+            // Check for duplicate ID
             string idToCheck = id;
-            if (!isUpdate && coordinates.Any(c => c.Id == idToCheck))
+            if (isUpdate)
             {
-                MessageBox.Show($"ID '{id}' already exists. Please use a unique ID.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
+                // For update, allow same ID if it's the current item being edited
+                if (id != currentId && coordinates.Any(c => c.Id == idToCheck))
+                {
+                    MessageBox.Show($"ID '{id}' already exists. Please use a unique ID.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+            }
+            else
+            {
+                // For add, check if ID already exists
+                if (coordinates.Any(c => c.Id == idToCheck))
+                {
+                    MessageBox.Show($"ID '{id}' already exists. Please use a unique ID.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
             }
 
             // Validate X
@@ -175,15 +188,7 @@ namespace CoordinatesApp
 
             var selectedCoord = coordinates[listBoxCoords.SelectedIndex];
             
-            // For update, allow same ID if it's the selected item
-            string newId = txtId.Text.Trim();
-            if (newId != selectedCoord.Id && coordinates.Any(c => c.Id == newId))
-            {
-                MessageBox.Show($"ID '{newId}' already exists. Please use a unique ID.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (ValidateInput(out string id, out double x, out double y, out string label, isUpdate: true))
+            if (ValidateInput(out string id, out double x, out double y, out string label, isUpdate: true, currentId: selectedCoord.Id))
             {
                 selectedCoord.Id = id;
                 selectedCoord.X = x;
@@ -296,7 +301,7 @@ namespace CoordinatesApp
         private List<Coordinate> ImportFromJson(string filePath)
         {
             string json = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<List<Coordinate>>(json);
+            return JsonSerializer.Deserialize<List<Coordinate>>(json) ?? new List<Coordinate>();
         }
 
         private List<Coordinate> ImportFromCsv(string filePath)
