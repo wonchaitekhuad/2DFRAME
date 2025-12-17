@@ -322,10 +322,16 @@ namespace CoordinatesApp
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                var parts = line.Split(',');
+                // Simple CSV parsing with quoted field support
+                var parts = ParseCsvLine(line);
                 if (parts.Length >= 3)
                 {
                     string id = parts[0].Trim();
+                    
+                    // Validate ID is not empty
+                    if (string.IsNullOrWhiteSpace(id))
+                        continue;
+                        
                     if (double.TryParse(parts[1].Trim(), out double x) && 
                         double.TryParse(parts[2].Trim(), out double y))
                     {
@@ -336,6 +342,35 @@ namespace CoordinatesApp
             }
 
             return coords;
+        }
+
+        private string[] ParseCsvLine(string line)
+        {
+            var result = new System.Collections.Generic.List<string>();
+            var current = new StringBuilder();
+            bool inQuotes = false;
+
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                
+                if (c == '"')
+                {
+                    inQuotes = !inQuotes;
+                }
+                else if (c == ',' && !inQuotes)
+                {
+                    result.Add(current.ToString());
+                    current.Clear();
+                }
+                else
+                {
+                    current.Append(c);
+                }
+            }
+            
+            result.Add(current.ToString());
+            return result.ToArray();
         }
 
         private void btnExportJson_Click(object sender, EventArgs e)
@@ -381,7 +416,9 @@ namespace CoordinatesApp
                         
                         foreach (var coord in coordinates)
                         {
-                            sb.AppendLine($"{coord.Id},{coord.X},{coord.Y},{coord.Label}");
+                            // Escape label if it contains commas or quotes
+                            string escapedLabel = EscapeCsvField(coord.Label);
+                            sb.AppendLine($"{coord.Id},{coord.X},{coord.Y},{escapedLabel}");
                         }
 
                         File.WriteAllText(saveFileDialog.FileName, sb.ToString());
@@ -394,6 +431,20 @@ namespace CoordinatesApp
                     }
                 }
             }
+        }
+
+        private string EscapeCsvField(string field)
+        {
+            if (string.IsNullOrEmpty(field))
+                return field;
+                
+            // If field contains comma, newline, or quote, wrap it in quotes and escape quotes
+            if (field.Contains(",") || field.Contains("\n") || field.Contains("\""))
+            {
+                return $"\"{field.Replace("\"", "\"\"")}\"";
+            }
+            
+            return field;
         }
     }
 }
